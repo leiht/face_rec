@@ -2,6 +2,9 @@ import face_recognition
 import cv2
 import numpy as np
 import os
+from gtts import gTTS
+from pygame import mixer
+import time
 
 # This is a super simple (but slow) example of running face recognition on live video from your webcam.
 # There's a second example that's a little more complicated but runs faster.
@@ -12,6 +15,8 @@ import os
 
 # Get a reference to webcam #0 (the default one)
 video_capture = cv2.VideoCapture(0)
+
+mixer.init()
 
 #Load pictures from folder. Change path to your desired image-folder
 pic_dir = '/Users/jonatanthiel/Documents/Development/Python/face_recognition/Personalbilder/'
@@ -53,7 +58,14 @@ while True:
         best_match_index = np.argmin(face_distances)
         if matches[best_match_index]:
             name = known_face_names[best_match_index]
-            print(name)
+            print("hej " + name)
+            phrase = "Hej " + name
+            tts = gTTS(text=phrase, lang='sv')
+            tts.save('/Users/jonatanthiel/Documents/Development/Python/face_recognition/sound_files/'+phrase+'.mp3')
+            mixer.music.load('/Users/jonatanthiel/Documents/Development/Python/face_recognition/sound_files/'+phrase+'.mp3')
+            mixer.music.play()
+            time.sleep(5)
+
             
 
         # Draw a box around the face
