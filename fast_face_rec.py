@@ -15,7 +15,7 @@ import os
 # Get a reference to webcam #0 (the default one)
 video_capture = cv2.VideoCapture(1)
 
-#Load pictures from folder
+#Load pictures from folder. Change path to your desired image-folder
 pic_dir = '/Users/jonatanthiel/Documents/Development/Python/face_recognition/Personalbilder/'
 known_face_encodings=[]
 known_face_names=[]
@@ -24,29 +24,8 @@ for pic in os.listdir(pic_dir):
   known_face_names.append(pic)
   known_face_encodings.append(face_recognition.face_encodings(img)[0])
 
-
-# Load a sample picture and learn how to recognize it.
-#obama_image = face_recognition.load_image_file("obama.jpeg")
-#obama_face_encoding = face_recognition.face_encodings(obama_image)[0]
-
-# Load a second sample picture and learn how to recognize it.
-#biden_image = face_recognition.load_image_file("biden.jpeg")
-#biden_face_encoding = face_recognition.face_encodings(biden_image)[0]
-
-# Create arrays of known face encodings and their names
-#known_face_encodings = [
-#    obama_face_encoding,
-#    biden_face_encoding
-#]
-#known_face_names = [
-#    "Barack Obama",
-#    "Joe Biden"
-#]
-
-
 # Initialize some variables
 face_locations = []
-#face_encodings = []
 face_names = []
 process_this_frame = True
 
