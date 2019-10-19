@@ -14,14 +14,16 @@ import time
 # specific demo. If you have trouble installing it, try any of the other demos that don't require it instead.
 
 # Get a reference to webcam #0 (the default one)
-video_capture = cv2.VideoCapture(1)
+video_capture = cv2.VideoCapture(0)
 
 mixer.init()
 
 #Load pictures from folder. Change path to your desired image-folder
-pic_dir = '/Users/jonatanthiel/Documents/Development/Python/face_recognition/Personalbilder/'
+pic_dir = '/home/jonatan/Documents/Develop/Python/face_rec_files/Personalbilder/'
 known_face_encodings=[]
 known_face_names=[]
+last_known_face="Unknown"
+
 for pic in os.listdir(pic_dir):
   img = face_recognition.load_image_file(pic_dir + pic)
   #Change the split arguments to meet the requirements for your images.
@@ -47,8 +49,6 @@ while True:
         # See if the face is a match for the known face(s)
         matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
 
-        name = "Unknown"
-
         # If a match was found in known_face_encodings, just use the first one.
         # if True in matches:
         #     first_match_index = matches.index(True)
@@ -61,33 +61,40 @@ while True:
             s += i
         avg = s/len(face_distances)
         best_match_index = np.argmin(face_distances)
-        if matches[best_match_index] and avg >= 0.76:
+        
+        if matches[best_match_index] and avg >=0.76:
+            t = time.localtime()
             name = known_face_names[best_match_index]
-            print("hej " + name + " face distance: " + str(avg))
-            phrase = "Hej " + name
-            tts = gTTS(text=phrase, lang='sv')
-            tts.save('/Users/jonatanthiel/Documents/Development/Python/face_recognition/sound_files/'+phrase+'.mp3')
-            mixer.music.load('/Users/jonatanthiel/Documents/Development/Python/face_recognition/sound_files/'+phrase+'.mp3')
-            mixer.music.play()
-            time.sleep(3)
+            if last_known_face != name:
+                last_known_face = name
+                if t.tm_hour >= 6 and t.tm_hour <= 10:
+                    phrase = "Godmorgon " + name
+                else:
+                    phrase = "Hej " + name
+                print("hej " + name + " face distance: " + str(avg))
+                tts = gTTS(text=phrase, lang='sv')
+                tts.save('/home/jonatan/Documents/Develop/Python/face_rec_files/sound_files/'+phrase+'.mp3')
+                mixer.music.load('/home/jonatan/Documents/Develop/Python/face_rec_files/sound_files/'+phrase+'.mp3')
+                mixer.music.play()
+                time.sleep(3)
 
             
 
         # Draw a box around the face
-        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+        #cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
         # Draw a label with a name below the face
-        cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-        font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+        #cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+        #font = cv2.FONT_HERSHEY_DUPLEX
+        #cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
     # Display the resulting image
-    cv2.imshow('Video', frame)
+    #cv2.imshow('Video', frame)
 
     # Hit 'q' on the keyboard to quit!
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    #if cv2.waitKey(1) & 0xFF == ord('q'):
+    #    break
 
 # Release handle to the webcam
 video_capture.release()
-cv2.destroyAllWindows()
+#cv2.destroyAllWindows()
