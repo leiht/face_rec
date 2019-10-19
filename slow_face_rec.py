@@ -14,7 +14,7 @@ import time
 # specific demo. If you have trouble installing it, try any of the other demos that don't require it instead.
 
 # Get a reference to webcam #0 (the default one)
-video_capture = cv2.VideoCapture(0)
+video_capture = cv2.VideoCapture(1)
 
 mixer.init()
 
@@ -25,9 +25,10 @@ known_face_names=[]
 for pic in os.listdir(pic_dir):
   img = face_recognition.load_image_file(pic_dir + pic)
   #Change the split arguments to meet the requirements for your images.
-  f_name = str(pic.split()[0])
+  f_name = str(pic.split('_')[0])
   known_face_names.append(f_name)
   known_face_encodings.append(face_recognition.face_encodings(img)[0])
+  print(f_name)
 
 
 while True:
@@ -55,34 +56,38 @@ while True:
 
         # Or instead, use the known face with the smallest distance to the new face
         face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
+        s = 0
+        for i in face_distances:
+            s += i
+        avg = s/len(face_distances)
         best_match_index = np.argmin(face_distances)
-        if matches[best_match_index]:
+        if matches[best_match_index] and avg >= 0.76:
             name = known_face_names[best_match_index]
-            print("hej " + name)
+            print("hej " + name + " face distance: " + str(avg))
             phrase = "Hej " + name
             tts = gTTS(text=phrase, lang='sv')
             tts.save('/Users/jonatanthiel/Documents/Development/Python/face_recognition/sound_files/'+phrase+'.mp3')
             mixer.music.load('/Users/jonatanthiel/Documents/Development/Python/face_recognition/sound_files/'+phrase+'.mp3')
             mixer.music.play()
-            time.sleep(5)
+            time.sleep(3)
 
             
 
         # Draw a box around the face
-        #cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
         # Draw a label with a name below the face
-        #cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-        #font = cv2.FONT_HERSHEY_DUPLEX
-        #cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+        cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+        font = cv2.FONT_HERSHEY_DUPLEX
+        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
     # Display the resulting image
-    #cv2.imshow('Video', frame)
+    cv2.imshow('Video', frame)
 
     # Hit 'q' on the keyboard to quit!
-    #if cv2.waitKey(1) & 0xFF == ord('q'):
-    #    break
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
 # Release handle to the webcam
 video_capture.release()
-#cv2.destroyAllWindows()
+cv2.destroyAllWindows()
